@@ -1,0 +1,333 @@
+---
+title: "AFCA_analysis"
+output: html_document
+date: "2025-04-01"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/projects/ageing_flies")
+```
+
+Load the libraries 
+```{r}
+library(anndata)
+library(SeuratData)
+library(Seurat)
+library(SeuratDisk)
+library(reticulate)
+library(zellkonverter)
+library(MAST)
+library(tidyverse)
+library(dplyr)
+library(fs)
+library(stats)
+```
+
+Set the file and folder info
+```{r}
+# Set the Results path
+date <- format(Sys.Date(), "%Y%m%d")
+results_path <- path("Results/age_scdgea", date)
+if (!dir.exists(results_path)) {
+  dir.create(results_path, recursive = TRUE)
+}
+```
+
+
+
+Convert the Anndata to Seurat
+```{r}
+file.exists("Data/adata_body_filtered_2.h5ad")
+ad <- readH5AD("Data/adata_body_filtered_2.h5ad")
+adata_Seurat <- as.Seurat(ad, counts = "X", data = NULL)
+rm(ad)
+```
+
+Convert the needed variables to factors 
+```{r}
+adata_Seurat$age <- as.factor(adata_Seurat$age)
+adata_Seurat$batch <- as.factor(adata_Seurat$batch)
+adata_Seurat$sex_age <- as.factor(adata_Seurat$sex_age)
+adata_Seurat$afca_annotation <- as.factor(adata_Seurat$afca_annotation)
+```
+
+
+Define the groups and set the output file path
+```{r}
+# Define groups
+young_group <- "5"
+all_groups <- unique(adata_Seurat$age)
+other_groups <- setdiff(all_groups, young_group)
+
+# Get unique cell types (as character vector)
+cell_types <- unique(as.character(adata_Seurat$afca_annotation))
+print(cell_types)
+
+```
+
+Perform differential expression analysis per cell type
+```{r}
+# Set output file path
+results_file <- file.path(results_path, "combined_markers.csv")
+# remove file if it exists
+if (file.exists(results_file)) {
+  file.remove(results_file)
+}
+
+# Begin looping over cell types and comparisons
+for (ct in cell_types) {
+  cell_subset <-  subset(adata_Seurat, subset = afca_annotation == as.character(ct))
+  cat(paste("\n Covering the cell type:", ct, "\n"))
+
+  groups_present <- unique(cell_subset$age)
+
+  if (young_group %in% groups_present) {
+    for (grp in other_groups) {
+      if (grp %in% groups_present) {
+        cat(paste("  Running DGEA for:", young_group, "vs", grp, "\n"))
+        try({
+          markers <- FindMarkers(cell_subset,
+                                 ident.1 = young_group,
+                                 ident.2 = grp,
+                                 group.by = "age",
+                                 test.use = "wilcox",
+                                 # latent.vars = c("batch", "sex")
+                                 )
+
+          markers$cell_type <- ct
+          markers$comparison <- paste(young_group, "vs", grp)
+          markers$gene <- rownames(markers)
+          # rename the BF corretion
+          markers <- markers %>% rename(
+            p_val_BF = p_val_adj
+            )
+          # perform the BH correction
+          markers$p_val_adj <- p.adjust(markers$p_val, method = "BH")
+
+          # Write to CSV file (with header if first write)
+          write.table(markers, results_file,
+                      sep = ",",
+                      row.names = FALSE,
+                      col.names = !file.exists(results_file),
+                      append = file.exists(results_file))
+        }, silent = TRUE)
+      }
+    }
+  }
+}
+
+# # update the df by adjusting the pvalues with BH correction
+# combined_markers <- read.csv( "Results/combined_markers.csv") %>%
+#   group_by(cell_type) %>%
+#   mutate(adj_p_val_within_cell_type = p.adjust(p_val, method = "BH")) %>%
+#   ungroup()
+# 
+# # Save the final version of the df
+# write.csv(combined_markers, "Results/full_combined_markers.csv", row.names = FALSE)
+
+
+cat("All results saved incrementally to:\n", results_file, "\n")
+
+```
+
+
+Refine the df for more measured analysis
+```{r}
+# Create list with only the enterocyte types
+enterocyte_types <- unique(adata_Seurat$afca_annotation) %>% 
+  str_subset("enterocyte")
+
+# Create a new df with only the enterocyte types
+enterocyte_df <- adata_Seurat %>% 
+  subset(afca_annotation %in% enterocyte_types)
+```
+
+Perform differential expression analysis between age groups without subsetting by cell type
+```{r}
+# Set output file path
+results_file <- file.path(results_path, "entero_markers.csv")
+# remove file if it exists
+if (file.exists(results_file)) {
+  file.remove(results_file)
+}
+
+# loop over comparisons
+groups_present <- unique(enterocyte_df$age)
+for (grp in other_groups) {
+  if (grp %in% groups_present) {
+    cat(paste("  Running DGEA for:", young_group, "vs", grp, "\n"))
+    try({
+      markers <- FindMarkers(enterocyte_df,
+                             ident.1 = young_group,
+                             ident.2 = grp,
+                             group.by = "age",
+                             test.use = "wilcox",
+                             # latent.vars = c("batch", "sex") ONLY FOR MAST
+                             )
+      
+      # add cell type and comparison columns
+      markers$comparison <- paste(young_group, "vs", grp)
+      markers$gene <- rownames(markers)
+      # rename the BF corretion
+      markers <- markers %>% rename(
+        p_val_BF = p_val_adj
+      )
+      # perform the BH correction
+      markers$p_val_adj <- p.adjust(markers$p_val, method = "BH")
+  
+      # Write to CSV file (with header if first write)
+      write.table(markers, results_file,
+                  sep = ",",
+                  row.names = FALSE,
+                  col.names = !file.exists(results_file),
+                  append = file.exists(results_file))
+    }, silent = TRUE)
+  }
+}
+
+```
+
+
+
+
+INTERPRETATION & SUMMARISATION
+
+Load in the completed data and set paths
+```{r}
+diff_exp <- read.csv("Results/full_combined_markers.csv")
+adata_meta <- adata_Seurat@meta.data
+adata_meta$age <- as.integer(as.character(adata_meta$age))
+rm(adata_Seurat)
+```
+
+Summarise the expression data
+```{r}
+dif_exp_sum <- diff_exp %>%
+  group_by(cell_type, comparison) %>% 
+  summarise(
+    n_signif =  sum(adj_p_val_2 <= 0.1),
+    n_insignif = sum(adj_p_val_2 > 0.1),
+    total_genes = n(),
+    signif_ratio = round(
+      sum(adj_p_val_2 <= 0.1)/sum(adj_p_val_2>0.1),
+      5)
+  ) %>%
+  mutate(
+    age_1 = as.integer(str_split(comparison, 
+                      " ")[[1]][1]),
+    age_2= as.integer(str_split(comparison, 
+                      " ")[[1]][3])
+  )
+```
+
+
+
+Explore the samples from the original data
+
+Cell type summary to show per cell type: 
+- number of samples (flies)
+- number of cells
+- ratio of male/female
+- average n_genes_by_count
+- average total count
+
+
+```{r}
+ct_summary <- adata_meta %>%
+    group_by(afca_annotation, age) %>% 
+    summarise(
+      cell_count = n(),
+      sample_count = n_distinct(batch),
+      sex_ratio = round(sum(sex == "male")/sum(sex == "female"), 2),
+      avg_n_genes_by_cnt = round(mean(n_genes_by_counts),2),
+      avg_ttl_cnts = round(mean(total_counts),2),
+      avg_mt_genes = round(mean(total_counts_mt),2), 
+      avg_mt_pct = round(mean(pct_counts_mt),2)
+      )
+    
+```
+
+Age comparison summary to show per cell type: 
+- ratio of samples (flies)
+- ratio of cells
+- ratio of sex ratio
+- ratio of average n_genes_by_count
+- ratio average total count
+```{r}
+comp_summary <- ct_summary %>% 
+  select(-c("avg_mt_genes", "avg_mt_pct")) %>% 
+  mutate(
+    "5 vs 30" = ifelse((age == 5|age == 30), 1, 0),
+    "5 vs 50" = ifelse((age == 5|age == 50), 1, 0),
+    "5 vs 70" = ifelse((age == 5|age == 70), 1, 0)
+  ) %>%
+  pivot_longer(
+    cols = c("5v30", "5v50", "5v70"),
+    names_to = "comparison",
+    values_to = "included"
+  ) %>%
+  filter(included == 1) %>%
+  select(-included) %>%
+  pivot_wider(
+    id_cols = c(afca_annotation, comparison),
+    names_from = age,
+    values_from = c(cell_count, sample_count, sex_ratio,
+                    avg_n_genes_by_cnt, avg_ttl_cnts),
+    names_sep = "_age_"
+  ) %>%
+  mutate(
+    sample_comp = paste0(sample_count_age_5, ":", coalesce(
+      sample_count_age_30, 
+      sample_count_age_50, 
+      sample_count_age_70
+    )),
+    cells_comp = paste0(cell_count_age_5, ":", coalesce(
+      cell_count_age_30, 
+      cell_count_age_50, 
+      cell_count_age_70
+    )),
+    ratio_samples = sample_count_age_5 / coalesce(
+      sample_count_age_30, 
+      sample_count_age_50, 
+      sample_count_age_70
+    ),
+    ratio_cells = cell_count_age_5 / coalesce(
+      cell_count_age_30, 
+      cell_count_age_50, 
+      cell_count_age_70
+    ),
+    ratio_sex = sex_ratio_age_5 / coalesce(
+      sex_ratio_age_30, 
+      sex_ratio_age_50, 
+      sex_ratio_age_70
+    ),
+    ratio_avg_genes = avg_n_genes_by_cnt_age_5 / coalesce(
+      avg_n_genes_by_cnt_age_30, 
+      avg_n_genes_by_cnt_age_50, 
+      avg_n_genes_by_cnt_age_70
+    ),
+    ratio_avg_counts = avg_ttl_cnts_age_5 / coalesce(
+      avg_ttl_cnts_age_30, 
+      avg_ttl_cnts_age_50, 
+      avg_ttl_cnts_age_70
+    )
+  ) %>%
+  mutate(across(starts_with("ratio_"), ~round(., 2))) %>%
+  select(c("comparison","sample_comp", "cells_comp", starts_with("ratio"))) %>% 
+  left_join(
+    ., dif_exp_sum, by = join_by("afca_annotation" == "cell_type", "")
+  )
+    
+```
+
+
+
+
+
+
+
+
+
+
+

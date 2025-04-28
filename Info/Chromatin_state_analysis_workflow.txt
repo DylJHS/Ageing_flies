@@ -1,0 +1,34 @@
+Workflow 2
+
+1. Prepare Annotations
+- Load the Drosophila gene annotation file (GFF/GTF) into R as a GRanges object. (from flybase release 6)
+- Import the chromatin state BED file as a GRanges object.
+
+2. Map Chromatin States to Genes
+- Use overlap functions to associate BED regions with genes.
+- Assign chromatin state labels to genes based on overlapping regions.
+- Chose to ignore the strand (the tracks dataset only contain "+")
+
+3. Load Expression Data
+- Read expression TSV files, ensuring gene identifiers match the annotation.
+- Combine data into a matrix with genes as rows and samples as columns.
+- Associate the genes in the expression data with the tracks
+
+4. Define Sample Information
+- Create a metadata frame with sample names and age groups (young, middle-aged, old, very old).
+
+
+6. Perform Differential Expression Analysis
+- Use Deseq2
+- Run with contrasts (young-old, young-mid, ...)
+- Identify significantly differentially expressed genes based on statistical thresholds.
+- Create the volcano plots
+
+7. Summarise Expression Changes
+- Identify up- and down-regulated genes for each comparison.
+- Link differentially expressed genes to their chromatin state labels.
+
+8. Generate Output and Reports
+- Produce summary tables showing up/down-regulated genes overall and by chromatin state.
+- Visualise results using bar charts 
+

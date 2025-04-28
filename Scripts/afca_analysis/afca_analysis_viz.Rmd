@@ -1,0 +1,246 @@
+---
+title: "afca_analysis_visualisation"
+output: html_document
+date: "2025-03-31"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/projects/ageing_flies")
+```
+
+Load in the libraries
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(EnhancedVolcano)
+library(patchwork)
+library(cowplot)
+```
+
+Load in the data and set paths
+```{r}
+date <- format(Sys.Date(), "%Y%m%d")
+df_path <- file.path("Results/age_scdgea", date)
+# if exists create the marker variable
+if (file.exists(file.path(df_path, "combined_markers.csv"))) {
+  markers <- read.csv(file.path(df_path, "combined_markers.csv"))
+} else {
+  print("Markers file does not exist.")
+}
+if (file.exists(file.path(df_path, "entero_markers.csv"))) {
+  entero_markers <- read.csv(file.path(df_path, "entero_markers.csv"))
+} else {
+  print("Markers file does not exist.")
+}
+fig_path <- paste0("Figures/afca_analysis/", date)
+```
+
+Define the variables
+```{r}
+if (exists("markers") == TRUE){
+  cell_types <- unique(markers$cell_type)
+} 
+
+genes_of_interest <- c("Su(var)205","Su(var)3-9","G9a", "HP1b", "HP1c", "HP4", "HP5", "HP6", "ADD1", "Su(var)2-HP2", "Su(var)3-7", "Lam", "LamC", "LBR", "Kdm4A", "Kdm4B", "His2Av", "His3.3A", "His3.3B")
+baseline_genes <- c("Act88F","mhc", "TPnC4", "wupA", "Decay", "Strica", "Diap1", "Cyp6d2") 
+interesting_genes <- c(genes_of_interest, baseline_genes)
+
+```
+
+
+Create the volcano plot by cell type
+
+```{r}
+for (ct in cell_types) {
+  cat(paste0('\n\n\n\t Cell type is: ', str_to_upper(ct), '\n'))
+  
+  subset_ct <- subset(markers, markers$cell_type == as.character(ct))
+  age_comps <- unique(subset_ct$comparison)
+  
+  plots <- list()
+  
+  for (comp in age_comps) {
+    cat(paste0("\n\n age comparison: ", comp, "\n"))
+    subset_comp <- subset(subset_ct, subset_ct$comparison == comp)
+    
+    # Order data so genes of interest come last (plotted on top)
+    goi_flag <- subset_comp$gene %in% genes_of_interest
+    bg_flag <- subset_comp$gene %in% baseline_genes
+    subset_comp <- rbind(
+      subset_comp[!(goi_flag|bg_flag), ],
+      subset_comp[bg_flag, ],
+      subset_comp[goi_flag, ]
+    )
+    
+    # Map colours: red for genes of interest, grey otherwise
+    keyvals.colour <- ifelse(subset_comp$gene %in% genes_of_interest, '#920000',
+                             ifelse(subset_comp$gene %in% baseline_genes, '#004949',
+      'grey'))
+    
+    names(keyvals.colour) <- ifelse(subset_comp$gene %in% genes_of_interest, 'Gene of Interest',
+      ifelse(subset_comp$gene %in% baseline_genes, 'Comparitive gene',
+      'Other'))
+    
+    # Map sizes: 4 for genes of interest, 1 for others
+    keyvals.size <- ifelse(
+      subset_comp$gene %in% interesting_genes, 4, 1
+    )
+    names(keyvals.size) <- ifelse(
+      subset_comp$gene %in% interesting_genes, 'Gene of Interest', 'Other'
+    )
+    
+    
+    goi_sub <- subset_comp %>%
+      subset(., subset_comp$gene %in% genes_of_interest) %>%
+      mutate(abs_FC = abs(avg_log2FC))
+    
+    int_sub <- subset_comp %>%
+      subset(., subset_comp$gene %in% interesting_genes) %>%
+      mutate(abs_FC = abs(avg_log2FC)) 
+    
+    # Find the max pval from the set
+    min_pval <- min(int_sub$p_val_adj)
+    plt_min <- ifelse(min_pval < 0.005, 80/100*(min_pval), 0.005)
+    
+     # Find the max FC from the set
+    max_FC <- max(int_sub$abs_FC)
+    plt_FC <- ifelse(max_FC > 2.5, 150/100*(max_FC), 2.5)
+    
+    # Significance of the comparisons
+    both_insign <- all(goi_sub$abs_FC<1 | goi_sub$p_val_adj>0.1)
+    signif <- ifelse(both_insign, "Not significant", "Some significant")
+    
+    cat(paste0(
+      "\n All points insignif: ", both_insign,
+      "\n Both conditions significant: ", signif
+    ))
+    
+    vol_plt <- EnhancedVolcano(
+      subset_comp,
+      lab = ifelse(subset_comp$gene %in% interesting_genes, subset_comp$gene, ""),
+      selectLab = interesting_genes,
+      x = 'avg_log2FC',
+      y = 'p_val_adj',
+      subtitle = signif,
+      pCutoff = 0.1,
+      xlim = (c(-plt_FC, plt_FC)),
+      ylim = c(0, -log10(plt_min)),
+      title = comp,
+      colCustom = keyvals.colour,
+      pointSize = keyvals.size,
+      legendPosition = "none"
+    )
+    
+    plots[[comp]] <- vol_plt
+  }
+  
+  combined_plot <- wrap_plots(plots) + 
+    plot_annotation(title = paste("Volcano Plots -", ct))
+  
+  if (!dir.exists(fig_path)) {
+    dir.create(fig_path, recursive = TRUE)
+  }
+  
+  file_name <- paste0(fig_path, "/volcano_", ct, ".png")
+  ggsave(file_name, plot = combined_plot, width = 20, height = 9, dpi = 300)
+}
+
+```
+
+
+```{r}
+# clear old variables
+rm("plots", "subset_comp","age_comps")
+
+age_comps <- unique(entero_markers$comparison)
+
+plots <- list()
+
+for (comp in age_comps) {
+  cat(paste0("\n\n age comparison: ", comp, "\n"))
+  subset_comp <- subset(entero_markers, entero_markers$comparison == comp)
+  
+  # Order data so genes of interest come last (plotted on top)
+  goi_flag <- subset_comp$gene %in% genes_of_interest
+  bg_flag <- subset_comp$gene %in% baseline_genes
+  subset_comp <- rbind(
+    subset_comp[!(goi_flag|bg_flag), ],
+    subset_comp[bg_flag, ],
+    subset_comp[goi_flag, ]
+  )
+  
+  # Map colours: red for genes of interest, grey otherwise
+  keyvals.colour <- ifelse(subset_comp$gene %in% genes_of_interest, '#920000',
+                           ifelse(subset_comp$gene %in% baseline_genes, '#004949',
+    'grey'))
+  
+  names(keyvals.colour) <- ifelse(subset_comp$gene %in% genes_of_interest, 'Gene of Interest',
+    ifelse(subset_comp$gene %in% baseline_genes, 'Comparitive gene',
+    'Other'))
+  
+  # Map sizes: 4 for genes of interest, 1 for others
+  keyvals.size <- ifelse(
+    subset_comp$gene %in% interesting_genes, 4, 1
+  )
+  names(keyvals.size) <- ifelse(
+    subset_comp$gene %in% interesting_genes, 'Gene of Interest', 'Other'
+  )
+  
+  
+  goi_sub <- subset_comp %>%
+    subset(., subset_comp$gene %in% genes_of_interest) %>%
+    mutate(abs_FC = abs(avg_log2FC))
+  
+  int_sub <- subset_comp %>%
+    subset(., subset_comp$gene %in% interesting_genes) %>%
+    mutate(abs_FC = abs(avg_log2FC)) 
+  
+  # Find the max pval from the set
+  min_pval <- min(int_sub$p_val_adj)
+  plt_min <- ifelse(min_pval < 0.005, 80/100*(min_pval), 0.005)
+  
+   # Find the max FC from the set
+  max_FC <- max(int_sub$abs_FC)
+  plt_FC <- ifelse(max_FC > 2.5, 150/100*(max_FC), 2.5)
+  
+  # Significance of the comparisons
+  both_insign <- all(goi_sub$abs_FC<1 | goi_sub$p_val_adj>0.1)
+  signif <- ifelse(both_insign, "Not significant", "Some significant")
+  
+  cat(paste0(
+    "\n All points insignif: ", both_insign,
+    "\n Both conditions significant: ", signif
+  ))
+  
+  vol_plt <- EnhancedVolcano(
+    subset_comp,
+    lab = ifelse(subset_comp$gene %in% interesting_genes, subset_comp$gene, ""),
+    selectLab = interesting_genes,
+    x = 'avg_log2FC',
+    y = 'p_val_adj',
+    subtitle = signif,
+    pCutoff = 0.1,
+    xlim = (c(-plt_FC, plt_FC)),
+    ylim = c(0, -log10(plt_min)),
+    title = comp,
+    colCustom = keyvals.colour,
+    pointSize = keyvals.size,
+    legendPosition = "none"
+  )
+  
+  plots[[comp]] <- vol_plt
+}
+
+combined_plot <- wrap_plots(plots) + 
+  plot_annotation(title = paste("Volcano Plots -"))
+
+if (!dir.exists(fig_path)) {
+  dir.create(fig_path, recursive = TRUE)
+}
+
+file_name <- paste0(fig_path, "/volcano_enterocyte.png")
+ggsave(file_name, plot = combined_plot, width = 20, height = 9, dpi = 300)
+```
+

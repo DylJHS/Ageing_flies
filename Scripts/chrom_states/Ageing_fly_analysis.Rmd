@@ -1,0 +1,461 @@
+---
+title: "Ageing_fly_analysis"
+output: html_document
+date: "2025-02-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load the packages
+```{r}
+library(dplyr)
+library(rtracklayer)
+library(tidyverse)
+library(fuzzyjoin)
+library(readr)
+library(ggplot2)
+library(factoextra)
+library(FactoMineR)
+library(DESeq2)
+library(EnhancedVolcano)
+library(writexl)
+library(GenomicRanges)
+```
+
+Set the working directory
+```{r}
+setwd("P:/Janssen/chet_repair/dhaynessimmons/data_analysis/Ageing flies") 
+```
+
+Import the tracks and annotations
+```{r}
+raw_tracks <- import("Data/ISC_chromatin_states.updt.bed") %>% as.data.frame()
+raw_annotations <-  import("Data/dmel-all-r6.61.gtf/dmel-all-r6.61.gtf") %>% as.data.frame()
+```
+
+
+Reframe the dataframes
+```{r}
+new_tracks <- raw_tracks %>% select(c("seqnames", "start", "end", "width","strand", "name")) %>%
+  mutate(name = ifelse(name == "Swi/Snf", "Swi_Snf", name))
+
+# Refine the annotations to only genes and the strands and chromosomes that are present in the tracks dataframe
+new_annotations <- raw_annotations %>% 
+  select(c("seqnames","start", "end", "width", "strand", "gene_id", "gene_symbol"))
+```
+
+Create the GRange objects
+```{r}
+tracks_gr <- GRanges(new_tracks)
+annotations_gr <- GRanges(new_annotations)
+
+```
+
+
+Map the chromatin States to the Genes
+```{r}
+# Find overlaps where tracks are fully contained within genes
+hits <- findOverlaps(tracks_gr, annotations_gr, type = "any", ignore.strand = TRUE)
+
+# Extract gene info for each track
+new_tracks$gene_id <- NA
+new_tracks$gene_symbol <- NA
+new_tracks$gene_id[queryHits(hits)] <- mcols(annotations_gr)$gene_id[subjectHits(hits)]
+new_tracks$gene_symbol[queryHits(hits)] <- mcols(annotations_gr)$gene_symbol[subjectHits(hits)]
+```
+
+Transform back to df 
+```{r}
+tracks_res <- new_tracks %>% filter(!is.na(gene_id))
+```
+
+
+Import the expression data
+```{r}
+# Define the path to the folder containing the expression files
+folder_path <- "Data/GSE157794_RAW"
+
+# List all files in the folder
+file_list <- list.files(folder_path, full.names = TRUE)
+
+# Print out the list of files
+print(file_list)
+
+# Load each file into a list of data frames
+expression_list <- lapply(file_list, function(file) {
+  tryCatch({
+    read_tsv(file, skip = 3, show_col_types = FALSE)
+  }, error = function(e) {
+    message("Error reading file: ", file, "\n", e)
+    NULL
+  })
+})
+# Assign names to the list elements using the file names
+names(expression_list) <- tools::file_path_sans_ext(basename(file_list))
+```
+
+Add the metadata to the expression data
+```{r}
+# Define the age mapping as a named character vector
+age_mapping <- c(
+  "GSM4775100_sample2" = "young",
+  "GSM4775102_sample4" = "young",
+  "GSM4775106_sample8" = "young",
+  "GSM4775110_sample12" = "young",
+  "GSM4775111_sample13" = "young",
+  "GSM4775112_sample14" = "young",
+  "GSM4775113_sample15" = "young",
+  "GSM4775099_sample1" = "mid",
+  "GSM4775109_sample11" = "mid",
+  "GSM4775114_sample16" = "mid",
+  "GSM4775103_sample5" = "old",
+  "GSM4775105_sample7" = "old",
+  "GSM4775108_sample10" = "old",
+  "GSM4775101_sample3" = "geriatric",
+  "GSM4775104_sample6" = "geriatric",
+  "GSM4775107_sample9" = "geriatric"
+)
+
+# Iterate over the list of expression data frames and add the "age_cat" column and the name column
+for (sample in names(expression_list)) {
+  if (sample %in% names(age_mapping)) {
+    expression_list[[sample]]$age_cat <- age_mapping[[sample]]
+  } 
+}
+
+```
+
+
+Create the full dataframe 
+```{r}
+# Filtering out the records (genes) with no track assigned and those with no reads
+full_expression  <- dplyr::bind_rows(expression_list, .id = "sample") %>% 
+  mutate(track = tracks_res$name[match(ID_REF, tracks_res$gene_id)]) %>% 
+  filter(
+    (!is.na(track))
+    ) %>% 
+  select(-"VALUE")
+```
+
+
+Explore the data 
+```{r}
+#Plot the log count distributions by sample
+rna_dist <- ggplot(full_expression, aes(x = log(count+1))) +
+  geom_histogram()+
+  facet_wrap(~sample, scales = "free")
+```
+
+Perform a PCA using the samples as points coloured by age_cat
+```{r}
+#Redefine the data
+sample_pca_data <- full_expression %>% 
+  select(-"track") %>% 
+  mutate(count = log(count+1)) %>% 
+  pivot_wider(names_from = ID_REF, 
+              values_from = count,
+              values_fill = 0
+              ) %>% 
+  column_to_rownames(var = "sample")
+
+#perform the pca
+pca <- FactoMineR::PCA(sample_pca_data[,-1], graph = FALSE)
+
+#vis the pca
+pca_plt <- factoextra::fviz_pca_ind(
+  pca,
+  label = "none",
+  habillage = as.factor(sample_pca_data$age_cat))
+pca_plt
+```
+
+Perform a PCA using the genes as points coloured by track
+```{r}
+#Redefine the data
+gene_pca_data <- full_expression %>% 
+  select(-"age_cat") %>% 
+  mutate(count = log(count+1)) %>%
+  pivot_wider(names_from = sample, 
+              values_from = count,
+              values_fill = 0
+              ) %>% 
+  column_to_rownames(var = "ID_REF")
+
+#perform the pca
+pca <- FactoMineR::PCA(gene_pca_data[,-1], graph = FALSE)
+
+#vis the pca
+pca_plt <- factoextra::fviz_pca_ind(
+  pca,
+  axes = c(1,2),
+  label = "none",
+  habillage = as.factor(gene_pca_data$track))
+pca_plt
+
+```
+
+
+
+PERFORM THE DGEA
+
+Create the metadata
+```{r}
+meta_data <- full_expression[!duplicated(full_expression$sample),] %>% 
+  select(c("sample","age_cat")) %>% 
+  column_to_rownames("sample") 
+
+```
+
+Run the DESeq DGEA
+```{r}
+#Refine the counts dataset
+count_data <- full_expression %>% 
+  select(-c("track", "age_cat")) %>% 
+  pivot_wider(
+    names_from = sample,
+    values_from = count
+  ) %>% 
+  column_to_rownames("ID_REF")
+
+#Reconfigure the metdadata
+count_meta <- meta_data %>% 
+  mutate(age_cat = droplevels(as.factor(age_cat)))
+
+# Check the formatting of the data is correct
+all(colnames(count_data) %in% rownames(count_meta))
+all(colnames(count_data) == rownames(count_meta))
+
+#Create the Deseq obj
+dds <- DESeqDataSetFromMatrix(countData = count_data, 
+                       colData = count_meta,
+                       design = ~ age_cat)
+
+#Filter low gene count (less than 5 across all samples)
+kept <- rowSums(counts(dds)) >= 2
+dds <- dds[kept,]
+
+#Set the levels
+dds$age_cat <- relevel(dds$age_cat, ref = "young")
+
+# Run the DESeq
+dds <- DESeq(dds)
+```
+
+Get the Resutls from the DGEA
+```{r}
+#Get the Results for each group
+#young-mid
+yng_mid_res <- results(dds,
+                contrast = list("age_cat_mid_vs_young"))
+yng_mid_summary <- summary(yng_mid_res)
+
+#young-old
+yng_old_res <- results(dds,
+                contrast = list("age_cat_old_vs_young"))
+yng_old_summary <- summary(yng_old_res)
+
+#young-geriatric
+yng_ger_res <- results(dds,
+                contrast = list("age_cat_geriatric_vs_young"))
+yng_ger_summary <- summary(yng_ger_res)
+
+full_results <- rbind(
+  yng_mid_res %>% 
+    as.data.frame() %>% 
+    mutate(age_comp = "young-mid") %>% 
+    rownames_to_column(., var = "Gene"), 
+  yng_old_res %>% 
+    as.data.frame() %>% 
+    mutate(age_comp = "young-old") %>% 
+    rownames_to_column(., var = "Gene"), 
+  yng_ger_res %>% 
+    as.data.frame() %>% 
+    mutate(age_comp = "young-geriatric") %>% 
+    rownames_to_column(., var = "Gene")
+  ) %>% 
+  mutate(
+    track = full_expression$track[match(Gene, full_expression$ID_REF)] %>% 
+      as.factor()
+  )
+```
+
+
+
+
+Create the volcano plots for each age comparison
+```{r}
+output_folder <- "Figures/"
+for (cat in unique(full_results$age_comp)) {
+  
+  # Filter dataset for the current age category
+  subset_data <- subset(full_results, age_comp == cat)
+  
+  keyvals <- ifelse(
+    subset_data$track == "Swi/Snf", '#004949',
+      ifelse(subset_data$track == "PcG", '#FF6DB6',
+             ifelse(subset_data$track == "PolII", '#490092',
+                    ifelse(subset_data$track == "PolII_w", '#006DDB',
+                           ifelse(subset_data$track == "PcG-M", '#DB6D00',
+                                  ifelse(subset_data$track == "HP1", '#920000',
+                                         ifelse(subset_data$track == "Black", 'black',
+        'grey')))))))
+  names(keyvals)[keyvals == '#004949'] <- 'Swi/Snf'
+  names(keyvals)[keyvals == '#FF6DB6'] <- 'PcG'
+  names(keyvals)[keyvals == '#490092'] <- 'PolII'
+  names(keyvals)[keyvals == '#006DDB'] <- 'PolII_w'
+  names(keyvals)[keyvals == '#DB6D00'] <- 'PcG-M'
+  names(keyvals)[keyvals == '#920000'] <- 'HP1'
+  names(keyvals)[keyvals == 'black'] <- 'Black'
+  names(keyvals)[keyvals == 'grey'] <- 'Other'
+
+  # Generate volcano plot
+  vol_plt <- EnhancedVolcano(
+    subset_data,
+    lab = NA,  # Remove labels
+    x = 'log2FoldChange',
+    y = 'padj',
+    subtitle = "",
+    pCutoff = 0.1,
+    colCustom = keyvals,
+    title = paste("Volcano Plot -", cat)
+  )
+  
+  # Save the plot as a PNG file
+  # file_name <- paste0(output_folder, "volcano_", cat, ".png")
+  # ggsave(file_name, plot = vol_plt, width = 8, height = 6, dpi = 300)
+
+  # Print message confirming save
+  # print(paste("Saved:", file_name))
+}
+```
+Create the volcano plots for each track
+```{r}
+
+for (track_cat in unique(full_results$track)) {
+  
+  # Filter dataset for the current track category
+  subset_data <- subset(full_results, track == track_cat)
+  
+  # Define colors based on `age_comp` (not `track`!)
+  keyvals <- ifelse(
+    subset_data$age_comp == "young-mid", '#004949',
+      ifelse(subset_data$age_comp == "young-old", '#920000',
+             ifelse(subset_data$age_comp == "young-geriatric", '#490092', 'grey')))
+
+  # Assign names to colors
+  names(keyvals)[keyvals == '#004949'] <- 'young-mid'
+  names(keyvals)[keyvals == '#920000'] <- 'young-old'
+  names(keyvals)[keyvals == '#490092'] <- 'young-geriatric'
+  names(keyvals)[keyvals == 'grey'] <- 'Other'
+
+  # Generate volcano plot
+  vol_plt <- EnhancedVolcano(
+    subset_data,
+    lab = NA,  # Remove labels
+    x = 'log2FoldChange',
+    y = 'padj',
+    pCutoff = 0.1,
+    colCustom = keyvals,
+    title = "Expression Volcano Plot",
+    subtitle = paste("Chromatin state ", track_cat),
+    caption = paste0('Number of features: ', nrow(subset_data))
+  )
+  
+  # Save the plot as a PNG file
+  # file_name <- paste0(output_folder, "volcano_", track_cat, ".png")
+  # ggsave(file_name, plot = vol_plt, width = 8, height = 6, dpi = 300)
+
+  # Print message confirming save
+  # print(paste("Saved:", file_name))
+}
+```
+
+
+Reconfigure the data for interpretation
+```{r}
+recon_res <- full_results %>% 
+  mutate(
+    regulated = ifelse(
+      (log2FoldChange > 0) & (padj <= 0.1), "Upregulated",
+      ifelse(
+      (log2FoldChange < 0) & (padj <= 0.1), "Downregulated",
+      "Unchanged")
+    )
+  ) %>% 
+  filter(!is.na(padj)) %>% 
+  select(c("Gene", "age_comp", "track", "regulated")) 
+
+res_piv_wide <- pivot_wider(recon_res %>% 
+                         mutate(value = 1),
+                       names_from = regulated,
+                       values_from = value,
+                       values_fill = 0) %>% 
+  select(-Gene) %>% 
+  group_by(track, age_comp) %>% 
+  summarise(
+    Unchanged = sum(Unchanged),
+    Upregulated = sum(Upregulated), 
+    Downregulated = sum(Downregulated)
+  )
+
+res_piv_long <- res_piv_wide %>%
+  pivot_longer(cols = c(Unchanged, Upregulated, Downregulated),
+               names_to = "Regulation",
+               values_to = "Count")
+
+
+```
+
+Create the plots
+```{r}
+bar_plt <- ggplot(res_piv_long %>% 
+                 filter(!Regulation == "Unchanged"), aes(x = age_comp, y = Count, fill = Regulation)) +
+  geom_bar(stat = "identity", position = position_dodge(preserve = "single")) +  # Grouped bars
+  facet_wrap(~ track, scales = "free") +  # Facet by track
+  scale_fill_manual(values = c( "Upregulated" = "#920000", 
+                               "Downregulated" = "#004949")) +
+  labs(title = "Gene Counts by Chromatin State, Age Comparison and Expression Status",
+       x = "Age Comparison",
+       y = "Count",
+       fill = "Expression") +
+  theme_minimal(base_size = 14) +  # Clean theme
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 13),
+    strip.text = element_text(face = "bold")
+        )  # Rotate x-axis labels
+
+# Save the plot as a PNG file
+  # file_name <- paste0(output_folder, "bar_plt.png")
+  # ggsave(file_name, plot = bar_plt, width = 10, height = 8, dpi = 500)
+
+  # Print message confirming save
+  # print(paste("Saved:", file_name))
+```
+
+Create the excel tables
+```{r}
+names(res_piv_wide)[names(res_piv_wide) == "track"] <- "chromatin state"
+names(full_results)[names(full_results) == "track"] <- "chromatin state"
+
+partial_results <- full_results %>% 
+  select(c("Gene", "log2FoldChange", "pvalue", "padj", "age_comp", "chromatin state"))
+
+# write_xlsx(res_piv_wide, "Result_table.xlsx")
+# write_xlsx(partial_results, "Gene_table.xlsx")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

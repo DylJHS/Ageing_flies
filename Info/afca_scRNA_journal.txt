@@ -1,0 +1,128 @@
+25/03/25
+
+- Continued with the pipeline looking at the methods to do pseudbulk gene expression analysis using the samples in the data 
+- The process involves looping over the cell types, looping over the individual samples, aggregating the replicate counts for each sample
+- Found that the data does not contain the raw counts  but only the log transformed data
+- Will need ot use the FASTQ/A files from each of the samples in order to regain the reads and then construct the data from there
+- Or run a scDGE analysis that does not pseudobulk the data but is also less robust than the pseudobulk methods
+
+26/03/25
+
+- Going to run the analysis using scDGE methods. After the results are in I'll ask if they would like a more thourough look at the genes/cells using pseudobulk methods
+
+27/03/25 
+- Tried runnign DGEA with scanpy diffxpy but the tests were not successful
+- Running the analysis using Seurat instead of scanpy with python for better
+- Converting the data to seurat accessible forma
+- Verified that the "ncount_originalexp" were not the actual real counts that could not be seen in the original data with scanpy/anndata
+
+30/03/25
+- Runngin teh DGEA with Seruat and MAST
+- Ran on a test run with single cell type and between male_5 and male_70 using the batch as a latent variable 
+- Need to rerun using the iteration over the cell types and with pairwise comparison between (female_5 and male_5) (see Chatgpt)
+- When iterative running need to make sure to re-adjust the raw p_values (not the adj_pvalues) once all the iterations are complete with the BH correction
+
+31/03/25
+- Ran the DGE (afca_analysis_310325_v2.R) using Seurat and MAST with both the batch (sample) and the sex as latent factors
+- Creating a unique plot for each cell type
+- Need to write the volcano plot script
+- Want to color by age_comp and label the gene names 
+
+01/04/25
+- Plotting the graphs 
+- Shows not much significance in teh selected genes being differentially expressed
+- Could be due to the number of unique samples (flies) per cell type or age_comparison or the total number of subsamples
+- Need to write up the report and load it in teh elab
+
+02/04/25
+- Looking at the results in more detail
+- aggregatingby cell type and comparison and assessing joint feautures (n_cells, cell differentials, sample differentials, sex ratio differentials, n_sigificant, pct_signif) 
+
+03/04/25
+- Getting a detialed look at the correlations between the aggregated metrics and the cell types/comparisons
+- Did not show anything of too much value
+- Started formal report
+
+04/04/25
+- Continued formal report
+- looking at the non-numerical categories (cell_type, comparison)
+- trying to assess associations with the p-val/FC
+
+07/04/25 
+- Finishing formal report
+- Still waiting on the reponse from the Lab 
+
+08/04/25
+- Reading up on using the nf-core rnaseq pipeline to go from the raw fastq files to the tsv gene count files
+- Reading up on the data formats from the afca data 
+- Found the CellRanger data at https://zenodo.org/records/7853649
+- Downloading the cellranger data to the hpc 
+
+09/04/25
+- Processing the CellRanger data
+- Extracting the desired samples (Raw Filtered Body) to h5ad files
+- Concatenating the individual files to one file (trying to) 
+
+10/04/25 
+- Concatenated the files into one big one
+- trying to analyse the data
+
+11/04/25
+- Analysing the raw filtered CellRanger data 
+- The data lacks annotations for cell type 
+- Has the barcodes which am linking to the cell types using the full normalised dataset
+
+15/04/25
+- The cell ranger data does not contain the 5 day old fly samples as the data is only from the AFCA and not the FCA
+- Will have to use the data from both datasets and integrate them 
+- The age and the batch effects are confounded completely
+- They use ML and clustering in order to transfer the annotations from the FCA to the AFCA samples in order to correct for batch effects
+- Will rerun the DGEA using the the Wilcoxon Rank Sum test
+
+16/04/25
+- Ran the statistical DGEA using the wilcoxon Rank Sum test instead of MAST
+- Differences weren't too differentially
+
+17/04/25
+- Rerunning the test but using the BH correction as opposed to the Bonferroni correction which is too strict
+- Got better results than with the BF correction 
+- Will rerun using the full data and subsetting by cell type
+- Might also reprocess the data in a cell-type-specific manner to yield more accurate results
+
+18/04/25
+- Reading up on pre-processing the data in a cell-type specific manner 
+- Will apply a minimum gene expression based on expression in a minimum number of cells
+
+20/04/25
+- Looking at the shape of the subset data
+- Would ideally like to analyse cell types with > 100 cells for each of the 3 age brackets
+
+22/04/25
+- Subsetted the data based on the number of cells total and by age group
+- Cell type needs to have at least 100 cells in each age group for the different age groups in teh cell type
+- Created the subset 
+- Downloaded it 
+- Filtering the genes based on expression in at least 3 cells\
+- File too large to process on local machine
+- Made ct specific files 
+- Editing the afca_analysis RMD script to handle the multiple files
+
+23/04/25
+- Edited the script and running it in hpc due to the number fo comparisons and tests 
+
+24/04/25
+- Running the scripts in parallel
+- Got all the results for all the cell types
+
+25/04/25
+- Forgot to filter the genes to exclude non-expressed genes
+- Fitlering out the genes that are lowly expressed but which are not part of the gene list of interest ("Su(var)205","Su(var)3-9","G9a", "HP1b", "HP1c", "HP4", "HP5", "HP6", "ADD1", "Su(var)2-HP2", "Su(var)3-7", "Lam", "LamC", "LBR", "Kdm4A", "Kdm4B", "His2Av", "His3.3A", "His3.3B")
+- Generated the figures which showed better results 
+- Re-ran with the MAST function to account for batch/sample effects
+
+27/04/25
+- Transfered the files to /data/projects/Janssen/redox_chromatin/dhaynessimmons/data_analysis/ageing_flies/Results/afca_analysis/afca_scdgea_v2/ct_specific_MAST
+on the projects server
+
+28/04/25
+- Generated the volcano plots for the MAST results

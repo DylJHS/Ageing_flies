@@ -1,0 +1,74 @@
+Methodology
+
+
+
+	1. Data Preparation
+
+1.1 Importing Annotations and Chromatin States
+- The Drosophila gene annotation file (GTF format) from FlyBase release 6 (http://ftp.flybase.net/releases/current/dmel_r6.62/gtf) was imported using `rtracklayer` and converted into a `GRanges` object.
+- The chromatin state BED file was similarly imported and converted into a `GRanges` object.
+- The datasets were refined by selecting relevant columns (chromosome, start, end, strand, gene ID, gene symbol) for annotation and (chromosome, start, end, width, name) for chromatin states.
+- The chromatin state names were reformatted to maintain consistency (e.g., "Swi/Snf" renamed to "Swi_Snf").
+
+1.2 Mapping Chromatin States to Genes
+- The `findOverlaps()` function was used to map chromatin state regions onto gene annotations while ignoring strand orientation.
+- Each chromatin state was assigned to overlapping genes based on their genomic coordinates.
+- The resulting dataset was filtered to retain only genes associated with chromatin states.
+
+	2. Gene Expression Data Processing
+
+2.1 Importing Expression Data
+- RNA expression data was obtained from GEO (GSE157794) as multiple TSV files.
+- The files were read into R, skipping metadata lines, and loaded into a list of data frames.
+- Sample names were assigned based on file names.
+
+2.2 Defining Sample Metadata
+- Each sample was assigned an age category (young, middle-aged, old, geriatric) based on predefined mappings.
+- A metadata frame was created with sample names and their respective age groups.
+
+2.3 Merging Expression Data with Chromatin States
+- Expression data from all samples was merged into a single data frame, ensuring consistency in gene identifiers.
+- Genes were matched to their respective chromatin states.
+- Genes with no chromatin state annotation or zero expression across all samples were removed.
+
+	3. Exploratory Data Analysis
+
+3.1 Distribution of Expression Counts
+- Log-transformed expression values were visualized using histograms to assess overall distribution across samples.
+
+3.2 Principal Component Analysis (PCA)
+- PCA was performed on log-transformed expression data to identify major sources of variation.
+- PCA was conducted at both the sample level (coloured by age category) and gene level (coloured by chromatin state).
+
+	4. Differential Gene Expression Analysis
+
+4.1 Data Preparation for DESeq2
+- A count matrix was constructed with genes as rows and samples as columns.
+- The metadata was formatted to ensure consistency with the count matrix.
+- Genes with fewer than five total counts across all samples were removed.
+
+4.2 Running DESeq2
+- A `DESeqDataSet` object was created using DESeq2 with age group as the primary design factor.
+- The DESeq2 pipeline was executed to normalize counts and compute differentially expressed genes.
+- Age categories were compared in pairwise contrasts (young vs. middle-aged, young vs. old, young vs. geriatric).
+
+4.3 Extracting Differential Expression Results
+- DESeq2 results were extracted for each age contrast.
+- Genes were classified as significantly differentially expressed based on log2 fold-change and adjusted p-value (FDR < 0.1).
+- The results were merged with chromatin state annotations.
+
+	5. Visualization and Reporting
+
+5.1 Volcano Plots
+- Volcano plots were generated for each age comparison to highlight differentially expressed genes.
+- Genes were coloured by chromatin state in one set of plots and by age comparison in another.
+- Plots were saved as PNG files.
+
+5.2 Summary Tables and Bar Charts
+- Genes were categorized as upregulated (LFC >0), downregulated (LFC <0), or unchanged (padj > 0.1).
+- The number of differentially expressed genes was summarized by chromatin state and age comparison.
+- Bar charts were created to visualize differentially expressed gene counts across conditions.
+
+5.3 Exporting Results
+- Summary table saved as "Result_table.xlsx" and DESeq2 results saved as "Gene_table.xlsx and included gene IDs, log2 fold-changes, p-values, adjusted p-values, age contrasts, and chromatin state annotations.
+
