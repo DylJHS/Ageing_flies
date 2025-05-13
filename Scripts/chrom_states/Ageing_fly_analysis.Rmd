@@ -232,7 +232,7 @@ dds <- DESeqDataSetFromMatrix(countData = count_data,
                        colData = count_meta,
                        design = ~ age_cat)
 
-#Filter low gene count (less than 5 across all samples)
+#Filter low gene count (less than 2 across all samples)
 kept <- rowSums(counts(dds)) >= 2
 dds <- dds[kept,]
 

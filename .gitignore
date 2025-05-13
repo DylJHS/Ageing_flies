@@ -5,3 +5,4 @@
 Scripts/.Rhistory
 Scripts/.RData
 Scripts\*.Identifier
+*.Identifier
