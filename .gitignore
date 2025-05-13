@@ -3,7 +3,4 @@
 /results
 /logs
 /.Rproj.user
-Scripts/.Rhistory
-Scripts/.RData
-Scripts\*.Identifier
-*.Identifier
+
