@@ -1,6 +1,7 @@
-/Data
-/Figures
-/Results
+/data
+/figures
+/results
+/logs
 /.Rproj.user
 Scripts/.Rhistory
 Scripts/.RData
