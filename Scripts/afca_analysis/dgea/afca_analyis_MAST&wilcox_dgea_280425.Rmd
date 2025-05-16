@@ -1,5 +1,8 @@
 ---
 title: "AFCA_analysis"
+description: "Analysis of the afca dataset across different cell types and ages using 
+              Seurat for MAST based differential expression analysis with the sample (individual fly) 
+              as a latent variable. Followed by Wilcoxon rank sum test for solely enterocyte types."
 output: html_document
 date: "2025-04-22"
 ---
@@ -159,8 +162,7 @@ for (grp in other_groups) {
                              ident.1 = young_group,
                              ident.2 = grp,
                              group.by = "age",
-                             test.use = "wilcox",
-                             # latent.vars = c("batch", "sex") ONLY FOR MAST
+                             test.use = "wilcox"
                              )
       
       # add cell type and comparison columns

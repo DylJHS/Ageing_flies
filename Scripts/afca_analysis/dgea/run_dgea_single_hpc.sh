@@ -1,4 +1,10 @@
 # run_dgea_array.sh
+
+# This SLURM batch script submits an array job to perform differential gene expression analysis (DGEA) across multiple cell types in parallel. 
+# Each array task processes a single .h5ad file using run_dgea_single.R, which is run via Rscript. 
+# Input files are read from a specified directory, and results are saved to a corresponding output folder. 
+# The job requests 4 CPUs, 16 GB of memory, and includes email notifications and logging for each task.
+
 #!/bin/bash
 #SBATCH --job-name=dgea_single
 #SBATCH --output=/hpc/shared/onco_janssen/dhaynessimmons/logs/dgea_%A_%a.out

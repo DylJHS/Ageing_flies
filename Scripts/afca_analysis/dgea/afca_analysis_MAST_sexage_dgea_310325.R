@@ -1,3 +1,9 @@
+# This script performs differential gene expression analysis (DGEA) on a single-cell RNA-seq dataset of ageing Drosophila, 
+# comparing gene expression between 5-day-old flies and older age groups within each sex. 
+# It uses the MAST method via Seurat, with sex_age as the grouping variable and batch as a latent variable. 
+# For each cell type in the dataset, it tests all valid comparisons where a 5-day group (male or female) and another group are both present. 
+# Results for each comparison are appended to combined_markers.csv, including Benjamini-Hochberg adjusted p-values.
+
 # Load libraries
 library(Seurat)
 library(SeuratDisk)

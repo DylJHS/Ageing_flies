@@ -1,5 +1,9 @@
 ---
 title: "AFCA_analysis"
+description: "Differential expression analysis of the AFCA dataset across various cell types and age groups 
+              using Seurat. The analysis includes Wilcoxon rank-sum tests per cell type (5 days vs older ages),
+              followed by a combined analysis restricted to enterocyte subtypes. The script also summarises
+              gene-level and sample-level metrics across comparisons to aid interpretation."
 output: html_document
 date: "2025-04-01"
 ---
@@ -91,8 +95,7 @@ for (ct in cell_types) {
                                  ident.1 = young_group,
                                  ident.2 = grp,
                                  group.by = "age",
-                                 test.use = "wilcox",
-                                 # latent.vars = c("batch", "sex")
+                                 test.use = "wilcox"
                                  )
 
           markers$cell_type <- ct
@@ -162,8 +165,7 @@ for (grp in other_groups) {
                              ident.1 = young_group,
                              ident.2 = grp,
                              group.by = "age",
-                             test.use = "wilcox",
-                             # latent.vars = c("batch", "sex") ONLY FOR MAST
+                             test.use = "wilcox"
                              )
       
       # add cell type and comparison columns

@@ -1,5 +1,13 @@
 #!/usr/bin/env Rscript
 
+# This script performs differential gene expression analysis (DGEA) for a single cell type using the pre-filtered afca .h5ad file as input. 
+# It is designed to be run on an HPC system as part of an array job, where each task processes one cell type. 
+# The script converts the input AnnData file to a Seurat object, sets relevant metadata factors, and uses Seurat’s FindMarkers with the 
+# MAST test to compare 5-day-old flies against older age groups, adjusting for individual variation using indiv as a latent variable.
+# The results for each comparison are saved as a .csv file named after the input file. 
+# This script is intended to be called by run_dgea_array.sh, which distributes the workload across multiple SLURM array jobs.
+
+# Load required libraries
 library(Seurat)
 library(zellkonverter)
 library(dplyr)

@@ -1,5 +1,10 @@
 ---
 title: "afca_analysis_visualisation"
+description: "This script creates volcano plots from differential gene expression results across ageing 
+              comparisons in fly cell types. It highlights a predefined set of chromatin-related genes 
+              and adjusts plotting parameters dynamically. For each cell type, comparisons are visualised 
+              and saved as .png images. A second block generates plots specifically for enterocytes, 
+              with separate styling for baseline and interesting genes."
 output: html_document
 date: "2025-03-31"
 ---

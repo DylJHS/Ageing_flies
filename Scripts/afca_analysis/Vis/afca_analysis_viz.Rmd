@@ -1,5 +1,11 @@
 ---
 title: "afca_analysis_visualisation"
+description: "This script generates volcano plots from differential gene expression comparisons across ageing 
+              conditions in Drosophila cell types. It reads in a combined marker file containing results for all 
+              cell types, as well as a dedicated enterocyte marker file. Genes of interest and a secondary list 
+              of baseline genes are highlighted in each plot. For each cell type and each age comparison, the script 
+              creates a plot that labels and colours the selected gene groups. 
+              All plots are saved as .png files, grouped by cell type."
 output: html_document
 date: "2025-03-31"
 ---
