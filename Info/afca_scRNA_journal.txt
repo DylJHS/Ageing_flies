@@ -130,3 +130,8 @@ on the projects server
 29/04/25
 - Created the MAST_res_interprt.ipynb script to summarise the results to only the genes of interest and the 
 - Wrote up the report for the cell type-specific analysis
+
+17/05/25
+- wrote the script for the enterocyte group only
+- Generated the plots for that group
+- No significant difference in the plots compared to teh ones that had already been done

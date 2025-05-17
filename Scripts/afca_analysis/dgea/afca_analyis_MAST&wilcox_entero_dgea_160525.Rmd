@@ -1,10 +1,10 @@
 ---
 title: "AFCA_analysis"
-description: "Analysis of the afca dataset across different cell types and ages using 
-              Seurat for MAST based differential expression analysis with the sample (individual fly) 
-              as a latent variable. Followed by Wilcoxon rank sum test for solely enterocyte types."
+description: "Analysis of the afca dataset for enterocytes only using Seurat for MAST based differential
+              expression analysis across age comparisons with the sample (individual fly) as a latent variable.
+              Comparing the young age group vs older age groups"
 output: html_document
-date: "2025-04-22"
+date: "2025-05-17"
 ---
 
 ```{r setup, include=FALSE}
@@ -44,6 +44,7 @@ if (file.exists(results_file)) {
 
 
 ```{r}
+
 # Get the file name without the extension
 filepath <- fs::path("Data/entero_expr_set.h5ad")
 file_name <- path_file(filepath)
@@ -64,6 +65,7 @@ rm(ad)
 adata_Seurat$age <- as.factor(adata_Seurat$age)
 adata_Seurat$sex_age <- as.factor(adata_Seurat$sex_age)
 adata_Seurat$afca_annotation <- as.factor(adata_Seurat$afca_annotation)
+adata_Seurat$indiv <- as.factor(adata_Seurat$indiv)
 
 # Define groups 
 young_group <- "5" 
@@ -83,7 +85,7 @@ if (young_group %in% groups_present) {
                              ident.2 = grp,
                              group.by = "age",
                              test.use = "MAST",
-                             latent.vars = "batch"
+                             latent.vars = "indiv"
                              )
 
       # add cell type and comparison columns
@@ -105,7 +107,7 @@ if (young_group %in% groups_present) {
                   col.names = !file.exists(results_file),
                   append = file.exists(results_file))
       
-      Cat(paste("  Finished DGEA for:", young_group, "vs", grp, "\n"))
+      cat(paste("  Finished DGEA for:", young_group, "vs", grp, "\n"))
     }
   }
 }
