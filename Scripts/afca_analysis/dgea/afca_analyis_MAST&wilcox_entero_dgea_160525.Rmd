@@ -44,7 +44,6 @@ if (file.exists(results_file)) {
 
 
 ```{r}
-
 # Get the file name without the extension
 filepath <- fs::path("Data/entero_expr_set.h5ad")
 file_name <- path_file(filepath)
@@ -84,7 +83,7 @@ if (young_group %in% groups_present) {
                              ident.2 = grp,
                              group.by = "age",
                              test.use = "MAST",
-                             latent.vars = "indiv"
+                             latent.vars = "batch"
                              )
 
       # add cell type and comparison columns
@@ -105,30 +104,17 @@ if (young_group %in% groups_present) {
                   row.names = FALSE,
                   col.names = !file.exists(results_file),
                   append = file.exists(results_file))
+      
+      Cat(paste("  Finished DGEA for:", young_group, "vs", grp, "\n"))
     }
   }
 }
+cat("\t\t Finished DGEA for all groups \n")
 
   
 
 ```
 
-```{r}
-
-
-# # update the df by adjusting the pvalues with BH correction
-# combined_markers <- read.csv( "Results/combined_markers.csv") %>%
-#   group_by(cell_type) %>%
-#   mutate(adj_p_val_within_cell_type = p.adjust(p_val, method = "BH")) %>%
-#   ungroup()
-# 
-# # Save the final version of the df
-# write.csv(combined_markers, "Results/full_combined_markers.csv", row.names = FALSE)
-
-
-cat("All results saved incrementally to:\n", results_file, "\n")
-
-```
 
 
 
