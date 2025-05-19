@@ -1,10 +1,12 @@
 ---
 title: "AFCA_analysis"
-description: "Analysis of the afca dataset for enterocytes only using Seurat for MAST based differential
-              expression analysis across age comparisons with the sample (individual fly) as a latent variable.
-              Comparing the young age group vs older age groups"
-output: html_document
+description: Analysis of the afca dataset for enterocytes only using Seurat for MAST
+  based differential expression analysis across age comparisons with the sample (individual
+  fly) as a latent variable. Comparing the young age group vs older age groups
 date: "2025-05-17"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
