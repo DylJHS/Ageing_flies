@@ -1,0 +1,145 @@
+---
+title: "AFCA_analysis"
+description: "Analysis of the afca dataset across different cell types and ages using 
+              Seurat for MAST based differential expression analysis with the sample (individual fly) 
+              as a latent variable."
+output: html_document
+date: "2025-05-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/projects/ageing_flies")
+```
+
+Load the libraries 
+```{r}
+library(SeuratData)
+library(Seurat)
+library(zellkonverter)
+library(MAST)
+library(dplyr)
+library(fs)
+library(stats)
+library(devtools)
+library(utils)
+```
+
+Set the file and folder info
+```{r}
+# Set the Results path
+date <- format(Sys.Date(), "%Y%m%d")
+results_path <- fs::path("Results/age_scdgea", date)
+if (!dir.exists(results_path)) {
+  dir.create(results_path, recursive = TRUE)
+}
+
+# Set output file path
+results_file <- file.path(results_path, "combined_markers.csv")
+# remove file if it exists
+if (file.exists(results_file)) {
+  file.remove(results_file)
+}
+```
+
+
+```{r}
+origin_folder_path <- fs::path("Data/ct_specific/")
+file_list <- dir(origin_folder_path)
+# Loop over the files in the folder
+for (ct_file in file_list) {
+  print(ct_file)
+  if (ct_file != "muscle_cell.h5ad") {
+    next
+  }
+  # Get the file name without the extension
+  file_name <- path_file(ct_file)
+  ct_name <- path_ext_remove(file_name)
+  print(ct_name)
+
+  # Convert the Anndata to Seurat
+  
+  suppressWarnings({
+    ad <- readH5AD(as.character(fs::path(origin_folder_path, ct_file)))
+    adata_Seurat <- as.Seurat(ad, counts = "X", data = NULL)
+    })
+  rm(ad)
+
+  # Convert the variables
+  adata_Seurat$age <- as.factor(adata_Seurat$age)
+  adata_Seurat$sex_age <- as.factor(adata_Seurat$sex_age)
+  adata_Seurat$afca_annotation <- as.factor(adata_Seurat$afca_annotation)
+
+  # Define groups
+  young_group <- "5"
+  all_groups <- unique(adata_Seurat$age)
+  other_groups <- setdiff(all_groups, young_group)
+  
+  # Get the age groups in the data
+  groups_present <- unique(adata_Seurat$age)
+  
+  # Run the differential expression analysis
+  if (young_group %in% groups_present) {
+    for (grp in other_groups) {
+      if (grp %in% groups_present) {
+        cat(paste("  Running DGEA for:", young_group, "vs", grp, "\n"))
+        markers <- FindMarkers(adata_Seurat,
+                               ident.1 = young_group,
+                               ident.2 = grp,
+                               group.by = "age",
+                               test.use = "MAST",
+                               latent.vars = "indiv"
+                               )
+        
+        # add cell type and comparison columns
+        markers$cell_type <- ct_name
+        markers$comparison <- paste(young_group, "vs", grp)
+        markers$gene <- rownames(markers)
+        
+        # rename the BF corretion
+        markers <- markers %>% rename(
+          p_val_BF = p_val_adj
+          )
+        # perform the BH correction
+        markers$p_val_adj <- p.adjust(markers$p_val, method = "BH")
+
+        # Write to CSV file (with header if first write)
+        write.table(markers, results_file,
+                    sep = ",",
+                    row.names = FALSE,
+                    col.names = !file.exists(results_file),
+                    append = file.exists(results_file))
+      }
+    }
+  }
+}
+  
+
+```
+
+```{r}
+
+
+# # update the df by adjusting the pvalues with BH correction
+# combined_markers <- read.csv( "Results/combined_markers.csv") %>%
+#   group_by(cell_type) %>%
+#   mutate(adj_p_val_within_cell_type = p.adjust(p_val, method = "BH")) %>%
+#   ungroup()
+# 
+# # Save the final version of the df
+# write.csv(combined_markers, "Results/full_combined_markers.csv", row.names = FALSE)
+
+
+cat("All results saved incrementally to:\n", results_file, "\n")
+
+```
+
+
+
+
+
+
+
+
+
+
