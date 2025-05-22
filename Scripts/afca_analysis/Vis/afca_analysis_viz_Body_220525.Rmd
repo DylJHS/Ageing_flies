@@ -1,0 +1,142 @@
+---
+title: "afca_analysis_visualisation"
+description: "This script creates volcano plots from differential gene expression results across ageing 
+              comparisons in fly cell types. It highlights a predefined set of chromatin-related genes 
+              and adjusts plotting parameters dynamically. For each cell type, comparisons are visualised 
+              and saved as .png images. "
+output: html_document
+date: "2025-05-22"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/projects/ageing_flies")
+```
+
+Load in the libraries
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(EnhancedVolcano)
+library(patchwork)
+library(cowplot)
+```
+
+Load in the data and set paths
+```{r}
+date <- format(Sys.Date(), "%Y%m%d")
+input_path <- file.path("Results/age_scdgea", date,"ct_specific")
+fig_path <- paste0("Figures/afca_analysis/", date)
+```
+
+Define the variables
+```{r}
+if (exists("markers") == TRUE){
+  cell_types <- unique(markers$cell_type)
+} 
+
+genes_of_interest <- c("Su(var)205","Su(var)3-9","G9a", "HP1b", "HP1c", "HP4", "HP5", "HP6", "ADD1", "Su(var)2-HP2", "Su(var)3-7", "Lam", "LamC", "LBR", "Kdm4A", "Kdm4B", "His2Av", "His3.3A", "His3.3B")
+
+
+```
+
+Create the volcano plots
+```{r}
+# Loop over the cell type files in the folder 
+files <- list.files(input_path, pattern = "*.csv", full.names = TRUE)
+for (file in files) {
+  # Read in the data
+  markers <- read.csv(file, header = TRUE)
+  
+  # Get the cell type from the df
+  ct <- str_to_upper(markers$cell_type[1])
+  print(ct)
+  
+  # Get the age comparisons
+  age_comps <- unique(markers$comparison)
+  plots <- list()
+  
+  # Loop over the age comparisons
+  for (comp in age_comps) {
+    cat(paste0("\n age comparison: ", comp, "\n"))
+    subset_comp <- subset(markers, markers$comparison == comp)
+    
+    # Order data so genes of interest come last (plotted on top)
+    goi_flag <- subset_comp$gene %in% genes_of_interest
+    subset_comp <- rbind(
+      subset_comp[!(goi_flag), ],
+      subset_comp[goi_flag, ]
+    )
+    
+    # Map colours: red for genes of interest, grey otherwise
+    keyvals.colour <- ifelse(subset_comp$gene %in% genes_of_interest, '#920000','grey')
+    
+    names(keyvals.colour) <- ifelse(subset_comp$gene %in% genes_of_interest, 'Gene of Interest', 'Other')
+    
+    # Map sizes: 4 for genes of interest, 1 for others
+    keyvals.size <- ifelse(
+      subset_comp$gene %in% genes_of_interest, 4, 1
+    )
+    names(keyvals.size) <- ifelse(
+      subset_comp$gene %in% genes_of_interest, 'Gene of Interest', 'Other'
+    )
+    
+    
+    goi_sub <- subset_comp %>%
+      subset(., subset_comp$gene %in% genes_of_interest) %>%
+      mutate(abs_FC = abs(avg_log2FC))
+    
+    int_sub <- subset_comp %>%
+      subset(., subset_comp$gene %in% genes_of_interest) %>%
+      mutate(abs_FC = abs(avg_log2FC)) 
+    
+    # Find the max pval from the set
+    min_pval <- min(int_sub$p_val_adj)
+    plt_min <- ifelse(min_pval < 0.005, 80/100*(min_pval), 0.005)
+    
+     # Find the max FC from the set
+    max_FC <- max(int_sub$abs_FC)
+    plt_FC <- ifelse(max_FC > 2.5, 150/100*(max_FC), 2.5)
+    
+    # Significance of the comparisons
+    both_insign <- all(goi_sub$abs_FC<1 | goi_sub$p_val_adj>0.1)
+    signif <- ifelse(both_insign, "Not significant", "Some significant")
+    
+    cat(paste0(
+      "\n All points insignif: ", both_insign,
+      "\n Both conditions significant: ", signif
+    ))
+    
+    # Volcano plot
+    vol_plt <- EnhancedVolcano(
+      subset_comp,
+      lab = ifelse(subset_comp$gene %in% genes_of_interest, subset_comp$gene, ""),
+      selectLab = genes_of_interest,
+      x = 'avg_log2FC',
+      y = 'p_val_adj',
+      subtitle = signif,
+      pCutoff = 0.1,
+      xlim = (c(-plt_FC, plt_FC)),
+      ylim = c(0, -log10(plt_min)),
+      title = comp,
+      colCustom = keyvals.colour,
+      pointSize = keyvals.size,
+      legendPosition = "none"
+    )
+    plots[[comp]] <- vol_plt
+  }
+  
+  combined_plot <- wrap_plots(plots) + 
+    plot_annotation(title = ct)
+  
+  if (!dir.exists(fig_path)) {
+    dir.create(fig_path, recursive = TRUE)
+  }
+  
+  file_name <- paste0(fig_path, "/volcano_", ct, ".png")
+  ggsave(file_name, plot = combined_plot, width = 20, height = 9, dpi = 300)
+  
+}
+
+```

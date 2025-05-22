@@ -135,3 +135,13 @@ on the projects server
 - wrote the script for the enterocyte group only
 - Generated the plots for that group
 - No significant difference in the plots compared to teh ones that had already been done
+
+20/05/25
+- Writing up the report for the ELAB journal
+
+21/05/25
+- Writing up the report for the ELAB journal
+
+22/05/25
+- Writing up the report for the ELAB journal
+- Creating a new visualisation script that focuses only on the cell type specific volcano plots and not the enterocyte group as well

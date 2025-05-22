@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>afca_analysis_entero_geneset_data_prep_160525</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>afca_analysis_dgea_set_data_prep_280425</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -7515,7 +7515,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Description:</span>
@@ -7528,34 +7528,10 @@ a.anchor-link {
 
 <span class="c1"># Import the libraries</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span> 
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c6fdbbed">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Set the functions</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">split_by_batch_prefix</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Splits the index into two parts:</span>
-<span class="sd">    - Part before 'AFCA' or 'FCA'</span>
-<span class="sd">    - The rest starting with 'AFCA' or 'FCA'</span>
-<span class="sd">    """</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'(AFCA|FCA)'</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-    <span class="n">i</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">name</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span>
 </pre></div>
 </div>
 </div>
@@ -7570,7 +7546,30 @@ a.anchor-link {
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># load the dataset data and get the metadata</span>
-<span class="n">adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s2">"/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/data/adata_body_S_v1.0.h5ad"</span><span class="p">)</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s2">"/hpc/shared/onco_janssen/dhaynessimmons/data/ageing_flies/afca_data/base_body_h5ad_data/adata_body_S_v1.0.h5ad"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=986d28f9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Set the functions</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_by_batch_prefix</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Splits the string into two parts:</span>
+<span class="sd">    - Part before 'AFCA' or 'FCA'</span>
+<span class="sd">    - The rest starting with 'AFCA' or 'FCA'</span>
+<span class="sd">    """</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">'(AFCA|FCA)'</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span>
 </pre></div>
 </div>
 </div>
@@ -7633,15 +7632,12 @@ Name: count, dtype: int64
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Get the unique afca cell types that are part of the enterocyte lineage</span>
-<span class="n">entero_subtypes</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Get the unique afca cell types</span>
 <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
-    <span class="k">if</span> <span class="s2">"enterocyte"</span> <span class="ow">in</span> <span class="n">cell_type</span><span class="p">:</span>
-        <span class="n">entero_subtypes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Enterocyte subtypes: "</span><span class="p">,</span> <span class="n">entero_subtypes</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7654,9 +7650,93 @@ Name: count, dtype: int64
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>
-Enterocyte subtypes:  ['adult differentiating enterocyte', 'adult midgut enterocyte', 'enterocyte of anterior adult midgut epithelium', 'enterocyte of posterior adult midgut epithelium', 'enterocyte-like']
+<pre>16-cell germline cyst in germarium region 2a and 2b
+CNS surface associated glial cell
+adult Malpighian tubule principal cell
+adult Malpighian tubule principal cell of initial segment
+adult Malpighian tubule principal cell of lower segment
+adult Malpighian tubule principal cell of lower ureter
+adult Malpighian tubule stellate cell of main segment
+adult alary muscle
+adult differentiating enterocyte
+adult fat body_body
+adult glial cell
+adult heart ventral longitudinal muscle
+adult hindgut
+adult midgut enterocyte
+adult midgut-hindgut hybrid zone
+adult oenocyte
+adult peripheral nervous system
+adult reticular neuropil associated glial cell_body
+adult salivary gland
+adult tracheal cell
+adult ventral nervous system
+anterior ejaculatory duct
+antimicrobial peptide-producing cell
+cardia (1)
+cardia (2)
+cardiomyocyte, working adult heart muscle (non-ostia)
+cell body glial cell
+copper cell
+crop
+cyst cell
+ejaculatory bulb
+ejaculatory bulb epithelium
+enteroblast
+enterocyte of anterior adult midgut epithelium
+enterocyte of posterior adult midgut epithelium
+enterocyte-like
+enteroendocrine cell
+eo support cell
+epidermal cell that specialized in antimicrobial response
+epithelial cell_body
+escort cell
+female reproductive system
+follicle cell
+follicle stem cell and prefollicle cell
+germline cell
+gustatory receptor neuron
+hemocyte_body
+indirect flight muscle
+intestinal stem cell
+leg muscle motor neuron
+male accessory gland main cell
+male accessory gland secondary cell
+mechanosensory neuron of haltere
+midgut large flat cell
+multidendritic neuron
+muscle cell
+oviduct
+perineurial glial sheath
+pheromone-sensing neuron
+polar follicle cell
+posterior midgut*
+prefollicle cell/stalk follicle cell
+principal cell*
+scolopidial neuron
+seminal vesicle &amp; testis epithelia
+spermatid
+spermatocyte
+stalk follicle cell
+subperineurial glial cell_body
+unannotated
+visceral muscle of the crop
+visceral muscle of the midgut
+young germ cell
 </pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>
+<span class="ansi-red-intense-fg ansi-bold">The Kernel crashed while executing code in the current cell or a previous cell. 
+</span>
+<span class="ansi-red-intense-fg ansi-bold">Please review the code in the cell(s) to identify a possible cause of the failure. 
+</span>
+<span class="ansi-red-intense-fg ansi-bold">Click &lt;a href='https://aka.ms/vscodeJupyterKernelCrash'&gt;here&lt;/a&gt; for more info. 
+</span>
+<span class="ansi-red-intense-fg ansi-bold">View Jupyter &lt;a href='command:jupyter.viewOutput'&gt;log&lt;/a&gt; for further details.</span></pre>
 </div>
 </div>
 </div>
@@ -7666,12 +7746,17 @@ Enterocyte subtypes:  ['adult differentiating enterocyte', 'adult midgut enteroc
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># get cells where sex is neither F nor M</span>
-<span class="n">mix_adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">sex</span> <span class="o">!=</span> <span class="s2">"female"</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">sex</span> <span class="o">!=</span> <span class="s2">"male"</span><span class="p">)]</span>
+<span class="n">mix_adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">sex</span> <span class="o">!=</span> <span class="s2">"female"</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">sex</span> <span class="o">!=</span> <span class="s2">"male"</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mix_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># Remove them from the dataset</span>
+<span class="n">mf_adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">mix_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">&amp;</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"unannotated"</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="c1"># get the batch from the row name</span>
+<span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'batch'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">split_by_batch_prefix</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -7685,116 +7770,7 @@ Enterocyte subtypes:  ['adult differentiating enterocyte', 'adult midgut enteroc
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
 <pre>(4345, 15)
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=841c1eb4">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Remove them from the dataset</span>
-<span class="n">mf_adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="o">~</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">mix_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="o">&amp;</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"unannotated"</span><span class="p">)]</span>
-<span class="c1"># Only keep the cells that are in teh enterocyte lineage</span>
-<span class="n">mf_adata</span> <span class="o">=</span> <span class="n">mf_adata</span><span class="p">[</span><span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">entero_subtypes</span><span class="p">)]</span>
-
-<span class="c1"># get the indiv from the row name</span>
-<span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">'indiv'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">split_by_batch_prefix</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">mf_adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>                                          tissue     sex age    sex_age  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1   body  female  30  female_30   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1   body  female  30  female_30   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1   body  female  30  female_30   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1   body  female  30  female_30   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1   body  female  30  female_30   
-
-                                           n_genes_by_counts  total_counts  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1               1288        3819.0   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1               1167        3274.0   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1               1506        5080.0   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1               1206        3539.0   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1               1301        3662.0   
-
-                                           total_counts_mt  pct_counts_mt  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1              0.0       0.000000   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1              3.0       0.091631   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1              3.0       0.059055   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1              0.0       0.000000   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1              1.0       0.027307   
-
-                                           log1p_n_genes_by_counts  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1                 7.161622   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1                 7.063048   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1                 7.317876   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1                 7.095893   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1                 7.171657   
-
-                                           log1p_total_counts  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1            8.248006   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1            8.094073   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1            8.533263   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1            8.171882   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1            8.206038   
-
-                                           log1p_total_counts_mt dataset  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1               0.000000    AFCA   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1               1.386294    AFCA   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1               1.386294    AFCA   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1               0.000000    AFCA   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1               0.693147    AFCA   
-
-                                          fca_annotation  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1            nan   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1            nan   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1            nan   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1            nan   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1            nan   
-
-                                                                           afca_annotation  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1  enterocyte of posterior adult midgut epithelium   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1   enterocyte of anterior adult midgut epithelium   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1  enterocyte of posterior adult midgut epithelium   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1  enterocyte of posterior adult midgut epithelium   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1  enterocyte of posterior adult midgut epithelium   
-
-                                          afca_annotation_broad  \
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1       epithelial cell   
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1       epithelial cell   
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1       epithelial cell   
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1       epithelial cell   
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1       epithelial cell   
-
-                                                            indiv  
-AAAGTGAGTACTCGAT-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1  
-AACGAAATCGTTAGTG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1  
-AAGGTAAGTAGCACAG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1  
-AATCGACGTCTCACGG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1  
-AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1  
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/tmp/ipykernel_436793/3865041347.py:7: ImplicitModificationWarning: Trying to modify attribute `.obs` of view, initializing view as actual.
-  mf_adata.obs['indiv'] = mf_adata.obs.index.map(lambda x: split_by_batch_prefix(x))
+(265979, 15)
 </pre>
 </div>
 </div>
@@ -7805,7 +7781,7 @@ AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Get the observation dataframe as a pandas dataframe</span>
@@ -7814,7 +7790,7 @@ AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1
 <span class="n">cell_list</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="c1"># Set the save path </span>
-<span class="n">save_path</span> <span class="o">=</span> <span class="s2">"/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/data/"</span>
+<span class="n">save_path</span> <span class="o">=</span> <span class="s2">"/hpc/shared/onco_janssen/dhaynessimmons/data/ageing_flies/afca_data/base_body_h5ad_data/ct_specific/"</span>
 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># Gene list of interest</span>
@@ -7823,73 +7799,79 @@ AATGAAGGTTGGGTAG-1_AFCA_female_body_30_S1  AFCA_female_body_30_S1
     <span class="s2">"HP5"</span><span class="p">,</span> <span class="s2">"HP6"</span><span class="p">,</span> <span class="s2">"ADD1"</span><span class="p">,</span> <span class="s2">"Su(var)2-HP2"</span><span class="p">,</span> <span class="s2">"Su(var)3-7"</span><span class="p">,</span> <span class="s2">"Lam"</span><span class="p">,</span>
     <span class="s2">"LamC"</span><span class="p">,</span> <span class="s2">"LBR"</span><span class="p">,</span> <span class="s2">"Kdm4A"</span><span class="p">,</span> <span class="s2">"Kdm4B"</span><span class="p">,</span> <span class="s2">"His2Av"</span><span class="p">,</span> <span class="s2">"His3.3A"</span><span class="p">,</span> <span class="s2">"His3.3B"</span>
 <span class="p">]</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a3c22ae2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Evaluate the QC of the new adata object</span>
-<span class="n">cell_cnt</span> <span class="o">=</span> <span class="n">mf_adata_obs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"number of cells: "</span><span class="p">,</span> <span class="n">cell_cnt</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Min number of genes expressed : "</span><span class="p">,</span> <span class="n">mf_adata_obs</span><span class="o">.</span><span class="n">n_genes_by_counts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>number of cells:  1361
-Min number of genes expressed :  263
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=bb0d2b0e">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Check that each age group has at least 100 cells</span>
-<span class="n">age_grouped</span> <span class="o">=</span> <span class="n">mf_adata_obs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
-<span class="n">min_value</span> <span class="o">=</span> <span class="n">age_grouped</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Minimum number of cells in an age group: "</span><span class="p">,</span> <span class="n">min_value</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">min_value</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Not enough cells in an age group to proceed with analysis"</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"Sufficient cells in each age group to proceed with analysis"</span><span class="p">)</span>
-    <span class="c1"># Create a new adata object with the cell type data</span>
-    <span class="n">cell_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)</span>
+
+<span class="c1"># Loop through the afca cell types and create a new adata object for each cell type</span>
+<span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">mf_adata_obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="n">cell_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n\n</span><span class="s2">Working on cell type: "</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">,</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>	
+
+    <span class="c1"># Get the indices of the cells that match the current cell type</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">mf_adata_obs</span><span class="p">[</span><span class="n">mf_adata_obs</span><span class="p">[</span><span class="s1">'afca_annotation'</span><span class="p">]</span> <span class="o">==</span> <span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+    <span class="c1"># Create new pandas dataframe with the indices</span>
+    <span class="n">cell_type_df</span> <span class="o">=</span> <span class="n">mf_adata_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+    <span class="c1"># Evaluate the QC of the new adata object</span>
+    <span class="n">cell_cnt</span> <span class="o">=</span> <span class="n">cell_type_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"number of cells: "</span><span class="p">,</span> <span class="n">cell_cnt</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Min number of genes expressed : "</span><span class="p">,</span> <span class="n">cell_type_df</span><span class="o">.</span><span class="n">n_genes_by_counts</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">cell_cnt</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Not enough cells to proceed with analysis"</span><span class="p">)</span>
+        <span class="k">continue</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Sufficient cells to proceed with analysis"</span><span class="p">)</span>
+
+        <span class="c1"># Check that each age group has at least 100 cells</span>
+        <span class="n">age_grouped</span> <span class="o">=</span> <span class="n">cell_type_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">cell_type_df</span>
+        <span class="n">min_value</span> <span class="o">=</span> <span class="n">age_grouped</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">age_grouped</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Minimum number of cells in an age group: "</span><span class="p">,</span> <span class="n">min_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">min_value</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Not enough cells in an age group to proceed with analysis"</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Sufficient cells in each age group to proceed with analysis"</span><span class="p">)</span>
+            <span class="c1"># Create a new adata object with the cell type data</span>
+            <span class="n">cell_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_type</span><span class="p">)</span>
+
+    <span class="c1"># Create a new adata object for this cell type</span>
+    <span class="n">cell_type_adata</span> <span class="o">=</span> <span class="n">mf_adata</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">shape of cell type data: "</span><span class="p">,</span> <span class="n">cell_type_adata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># ----------- Custom gene filtering starts here ------------ #</span>
+
+    <span class="c1"># Compute how many cells express each gene</span>
+    <span class="n">gene_expression_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">cell_type_adata</span><span class="o">.</span><span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="c1"># Get gene names</span>
+    <span class="n">gene_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">cell_type_adata</span><span class="o">.</span><span class="n">var_names</span><span class="p">)</span>
+
+    <span class="c1"># Genes expressed in &gt;= 3 cells</span>
+    <span class="n">genes_expressed_enough</span> <span class="o">=</span> <span class="n">gene_expression_counts</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+
+    <span class="c1"># Create a boolean mask to keep genes that are either:</span>
+    <span class="c1"># - expressed in enough cells</span>
+    <span class="c1"># - or present in the gene_list</span>
+    <span class="n">gene_list_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">gene_list</span><span class="p">)</span>
+    <span class="n">genes_in_list</span> <span class="o">=</span> <span class="n">gene_names</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gene_list_set</span><span class="p">)</span>
+
+    <span class="c1"># Combine masks</span>
+    <span class="n">genes_to_keep</span> <span class="o">=</span> <span class="n">genes_expressed_enough</span> <span class="o">|</span> <span class="n">genes_in_list</span>
+
+    <span class="c1"># Filter genes</span>
+    <span class="n">cell_type_adata</span> <span class="o">=</span> <span class="n">cell_type_adata</span><span class="p">[:,</span> <span class="n">genes_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">shape of cell type data after filtering: "</span><span class="p">,</span> <span class="n">cell_type_adata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># ----------- End of custom filtering ------------ #</span>
+
+    <span class="c1"># Save the new adata object</span>
+    <span class="n">cell_type_adata</span><span class="o">.</span><span class="n">write_h5ad</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">save_path</span><span class="si">}{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">.h5ad"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n\t</span><span class="s2">Saved the new adata object to: "</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">save_path</span><span class="si">}{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">.h5ad</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="c1"># Print list of successfully processed cell types</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cell_list</span><span class="p">)</span>
 <span class="k">del</span> <span class="n">mf_adata_obs</span>
 </pre></div>
 </div>
@@ -7903,74 +7885,612 @@ Min number of genes expressed :  263
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Minimum number of cells in an age group:  161
+<pre>&lt;class 'pandas.core.frame.DataFrame'&gt;
+
+
+Working on cell type:  follicle cell 
+
+number of cells:  25251
+Min number of genes expressed :  226
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  5826
 Sufficient cells in each age group to proceed with analysis
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=f835d627">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Create a new adata object </span>
-<span class="n">cell_group_adata</span> <span class="o">=</span> <span class="n">mf_adata</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">shape of cell type data: "</span><span class="p">,</span> <span class="n">cell_group_adata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
-<span class="c1"># ----------- Custom gene filtering starts here ------------ #</span>
 
-<span class="c1"># Compute how many cells express each gene</span>
-<span class="n">gene_expression_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">cell_group_adata</span><span class="o">.</span><span class="n">X</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+Working on cell type:  adult fat body_body 
 
-<span class="c1"># Get gene names</span>
-<span class="n">gene_names</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">cell_group_adata</span><span class="o">.</span><span class="n">var_names</span><span class="p">)</span>
+number of cells:  31311
+Min number of genes expressed :  224
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  2703
+Sufficient cells in each age group to proceed with analysis
 
-<span class="c1"># Genes expressed in &gt;= 3 cells</span>
-<span class="n">genes_expressed_enough</span> <span class="o">=</span> <span class="n">gene_expression_counts</span> <span class="o">&gt;=</span> <span class="mi">3</span>
 
-<span class="c1"># Create a boolean mask to keep genes that are either:</span>
-<span class="c1"># - expressed in enough cells</span>
-<span class="c1"># - or present in the gene_list</span>
-<span class="n">gene_list_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">gene_list</span><span class="p">)</span>
-<span class="n">genes_in_list</span> <span class="o">=</span> <span class="n">gene_names</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gene_list_set</span><span class="p">)</span>
+Working on cell type:  adult hindgut 
 
-<span class="c1"># Combine masks</span>
-<span class="n">genes_to_keep</span> <span class="o">=</span> <span class="n">genes_expressed_enough</span> <span class="o">|</span> <span class="n">genes_in_list</span>
+number of cells:  683
+Min number of genes expressed :  286
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  146
+Sufficient cells in each age group to proceed with analysis
 
-<span class="c1"># Filter genes</span>
-<span class="n">cell_group_adata</span> <span class="o">=</span> <span class="n">cell_group_adata</span><span class="p">[:,</span> <span class="n">genes_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">shape of cell type data after filtering: "</span><span class="p">,</span> <span class="n">cell_group_adata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+Working on cell type:  adult oenocyte 
 
-<span class="c1"># ----------- End of custom filtering ------------ #</span>
+number of cells:  5925
+Min number of genes expressed :  233
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  1081
+Sufficient cells in each age group to proceed with analysis
 
-<span class="c1"># Save the new adata object</span>
-<span class="n">cell_group_adata</span><span class="o">.</span><span class="n">write_h5ad</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">entero_expr_set.h5ad"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n\t</span><span class="s2">Saved the new adata object to: "</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">entero_expr_set.h5ad</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>
-shape of cell type data:  (1361, 15992)
 
-shape of cell type data after filtering:  (1361, 10451)
+Working on cell type:  hemocyte_body 
 
-	Saved the new adata object to:  /hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/data/entero_expr_set.h5ad
+number of cells:  2962
+Min number of genes expressed :  213
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  560
+Sufficient cells in each age group to proceed with analysis
 
+
+Working on cell type:  adult tracheal cell 
+
+number of cells:  6939
+Min number of genes expressed :  207
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  1154
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  crop 
+
+number of cells:  6226
+Min number of genes expressed :  261
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  1051
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult ventral nervous system 
+
+number of cells:  22172
+Min number of genes expressed :  271
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  3454
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  enteroendocrine cell 
+
+number of cells:  529
+Min number of genes expressed :  268
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  75
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  germline cell 
+
+number of cells:  3824
+Min number of genes expressed :  208
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  435
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  enterocyte of posterior adult midgut epithelium 
+
+number of cells:  751
+Min number of genes expressed :  263
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  40
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  cardia (1) 
+
+number of cells:  1062
+Min number of genes expressed :  298
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  42
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  antimicrobial peptide-producing cell 
+
+number of cells:  104
+Min number of genes expressed :  390
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  female reproductive system 
+
+number of cells:  1219
+Min number of genes expressed :  287
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  256
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  scolopidial neuron 
+
+number of cells:  1295
+Min number of genes expressed :  278
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  211
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult salivary gland 
+
+number of cells:  583
+Min number of genes expressed :  280
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  52
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  intestinal stem cell 
+
+number of cells:  2132
+Min number of genes expressed :  282
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  254
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult peripheral nervous system 
+
+number of cells:  5889
+Min number of genes expressed :  255
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  737
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  mechanosensory neuron of haltere 
+
+number of cells:  635
+Min number of genes expressed :  259
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  136
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  epithelial cell_body 
+
+number of cells:  42978
+Min number of genes expressed :  211
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  5034
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  escort cell 
+
+number of cells:  756
+Min number of genes expressed :  304
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  99
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  enterocyte of anterior adult midgut epithelium 
+
+number of cells:  182
+Min number of genes expressed :  281
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  midgut large flat cell 
+
+number of cells:  73
+Min number of genes expressed :  525
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  eo support cell 
+
+number of cells:  2449
+Min number of genes expressed :  268
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  407
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  pheromone-sensing neuron 
+
+number of cells:  672
+Min number of genes expressed :  303
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  101
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  polar follicle cell 
+
+number of cells:  304
+Min number of genes expressed :  318
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  48
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  enteroblast 
+
+number of cells:  2404
+Min number of genes expressed :  270
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  247
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  oviduct 
+
+number of cells:  1517
+Min number of genes expressed :  256
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  257
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  muscle cell 
+
+number of cells:  53895
+Min number of genes expressed :  201
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  5675
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  copper cell 
+
+number of cells:  149
+Min number of genes expressed :  265
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  enterocyte-like 
+
+number of cells:  259
+Min number of genes expressed :  301
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  38
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  follicle stem cell and prefollicle cell 
+
+number of cells:  430
+Min number of genes expressed :  278
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  5
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  leg muscle motor neuron 
+
+number of cells:  355
+Min number of genes expressed :  384
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  64
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult midgut-hindgut hybrid zone 
+
+number of cells:  576
+Min number of genes expressed :  279
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  51
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult midgut enterocyte 
+
+number of cells:  97
+Min number of genes expressed :  367
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  gustatory receptor neuron 
+
+number of cells:  695
+Min number of genes expressed :  298
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  100
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult Malpighian tubule principal cell of lower segment 
+
+number of cells:  50
+Min number of genes expressed :  317
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  cardia (2) 
+
+number of cells:  60
+Min number of genes expressed :  332
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  adult Malpighian tubule principal cell 
+
+number of cells:  47
+Min number of genes expressed :  238
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  young germ cell 
+
+number of cells:  224
+Min number of genes expressed :  216
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  24
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  16-cell germline cyst in germarium region 2a and 2b 
+
+number of cells:  532
+Min number of genes expressed :  366
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  82
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult Malpighian tubule principal cell of lower ureter 
+
+number of cells:  35
+Min number of genes expressed :  582
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  stalk follicle cell 
+
+number of cells:  293
+Min number of genes expressed :  276
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  33
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  multidendritic neuron 
+
+number of cells:  210
+Min number of genes expressed :  263
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  27
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  posterior midgut* 
+
+number of cells:  114
+Min number of genes expressed :  343
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  prefollicle cell-stalk follicle cell 
+
+number of cells:  0
+Min number of genes expressed :  nan
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  epidermal cell that specialized in antimicrobial response 
+
+number of cells:  91
+Min number of genes expressed :  268
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  indirect flight muscle 
+
+number of cells:  17625
+Min number of genes expressed :  211
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  773
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  cell body glial cell 
+
+number of cells:  2306
+Min number of genes expressed :  223
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  357
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  visceral muscle of the midgut 
+
+number of cells:  1253
+Min number of genes expressed :  275
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  227
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult alary muscle 
+
+number of cells:  2706
+Min number of genes expressed :  226
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  362
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  visceral muscle of the crop 
+
+number of cells:  760
+Min number of genes expressed :  274
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  67
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult glial cell 
+
+number of cells:  2153
+Min number of genes expressed :  252
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  282
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  cardiomyocyte, working adult heart muscle (non-ostia) 
+
+number of cells:  34
+Min number of genes expressed :  465
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  principal cell* 
+
+number of cells:  121
+Min number of genes expressed :  223
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  adult heart ventral longitudinal muscle 
+
+number of cells:  112
+Min number of genes expressed :  280
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  adult differentiating enterocyte 
+
+number of cells:  72
+Min number of genes expressed :  460
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  perineurial glial sheath 
+
+number of cells:  2181
+Min number of genes expressed :  260
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  334
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  subperineurial glial cell_body 
+
+number of cells:  1431
+Min number of genes expressed :  280
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  279
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  adult Malpighian tubule principal cell of initial segment 
+
+number of cells:  70
+Min number of genes expressed :  295
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  CNS surface associated glial cell 
+
+number of cells:  208
+Min number of genes expressed :  271
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  31
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult reticular neuropil associated glial cell_body 
+
+number of cells:  521
+Min number of genes expressed :  255
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  29
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  adult Malpighian tubule stellate cell of main segment 
+
+number of cells:  10
+Min number of genes expressed :  675
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  seminal vesicle &amp; testis epithelia 
+
+number of cells:  635
+Min number of genes expressed :  253
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  121
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  ejaculatory bulb 
+
+number of cells:  1401
+Min number of genes expressed :  285
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  125
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  ejaculatory bulb epithelium 
+
+number of cells:  549
+Min number of genes expressed :  334
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  56
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  anterior ejaculatory duct 
+
+number of cells:  189
+Min number of genes expressed :  280
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  male accessory gland main cell 
+
+number of cells:  2015
+Min number of genes expressed :  265
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  225
+Sufficient cells in each age group to proceed with analysis
+
+
+Working on cell type:  spermatid 
+
+number of cells:  131
+Min number of genes expressed :  203
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  cyst cell 
+
+number of cells:  201
+Min number of genes expressed :  207
+Sufficient cells to proceed with analysis
+Minimum number of cells in an age group:  26
+Not enough cells in an age group to proceed with analysis
+
+
+Working on cell type:  male accessory gland secondary cell 
+
+number of cells:  20
+Min number of genes expressed :  336
+Not enough cells to proceed with analysis
+
+
+Working on cell type:  spermatocyte 
+
+number of cells:  90
+Min number of genes expressed :  224
+Not enough cells to proceed with analysis
+['follicle cell', 'adult fat body_body', 'adult hindgut', 'adult oenocyte', 'hemocyte_body', 'adult tracheal cell', 'crop', 'adult ventral nervous system', 'germline cell', 'female reproductive system', 'scolopidial neuron', 'intestinal stem cell', 'adult peripheral nervous system', 'mechanosensory neuron of haltere', 'epithelial cell_body', 'eo support cell', 'pheromone-sensing neuron', 'enteroblast', 'oviduct', 'muscle cell', 'gustatory receptor neuron', 'indirect flight muscle', 'cell body glial cell', 'visceral muscle of the midgut', 'adult alary muscle', 'adult glial cell', 'perineurial glial sheath', 'subperineurial glial cell_body', 'seminal vesicle &amp; testis epithelia', 'ejaculatory bulb', 'male accessory gland main cell']
 </pre>
 </div>
 </div>

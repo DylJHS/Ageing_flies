@@ -42,7 +42,6 @@ rm(ad)
 
 # Convert variables
 adata_Seurat$age <- as.factor(adata_Seurat$age)
-adata_Seurat$sex_age <- as.factor(adata_Seurat$sex_age)
 adata_Seurat$afca_annotation <- as.factor(adata_Seurat$afca_annotation)
 adata_Seurat$indiv <- as.factor(adata_Seurat$indiv)
 
