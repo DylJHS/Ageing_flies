@@ -4,3 +4,5 @@
 /logs
 /.Rproj.user
 
+/scripts/random_search.py
+random_search.py
