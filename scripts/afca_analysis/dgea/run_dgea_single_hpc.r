@@ -9,6 +9,7 @@
 
 # Load required libraries
 library(Seurat)
+library(reticulate)
 library(zellkonverter)
 library(dplyr)
 library(fs)

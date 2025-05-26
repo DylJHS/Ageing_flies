@@ -5,18 +5,22 @@
 # Input files are read from a specified directory, and results are saved to a corresponding output folder. 
 # The job requests 4 CPUs, 16 GB of memory, and includes email notifications and logging for each task.
 
-
 #SBATCH --job-name=dgea_single
 #SBATCH --output=/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/logs/dgea_%A_%a.out
 #SBATCH --error=/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/logs/dgea_%A_%a.err
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=4
-#SBATCH --array=0-58%5
-#SBATCH --mem=16G
+#SBATCH --array=0-31%5
+#SBATCH --mem=5G
 #SBATCH --mail-type=all
 #SBATCH --mail-user=d.j.haynes-simmons@umcutrecht.nl
 
-module load R
+set -euo pipefail  
+
+# Load necessary modules and activate conda environment
+export PATH=/hpc/shared/onco_janssen/dhaynessimmons/envs/miniconda3/bin:$PATH
+source /hpc/shared/onco_janssen/dhaynessimmons/envs/miniconda3/etc/profile.d/conda.sh
+conda activate /hpc/shared/onco_janssen/dhaynessimmons/envs/dgea_env
 
 # Paths
 INPUT_DIR="/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/data/ct_specific"
@@ -30,4 +34,4 @@ FILES=($INPUT_DIR/*)
 INPUT_FILE=${FILES[$SLURM_ARRAY_TASK_ID]}
 
 # Run the per-file R script
-Rscript run_dgea_single.R "$INPUT_FILE" "$OUTPUT_DIR"
+Rscript /hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/scripts/afca_analysis/dgea/run_dgea_single_hpc.r "$INPUT_FILE" "$OUTPUT_DIR"
