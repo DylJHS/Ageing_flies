@@ -8,10 +8,9 @@
 #SBATCH --job-name=dgea_single
 #SBATCH --output=/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/logs/dgea_%A_%a.out
 #SBATCH --error=/hpc/shared/onco_janssen/dhaynessimmons/projects/ageing_flies/logs/dgea_%A_%a.err
-#SBATCH --time=01:00:00
-#SBATCH --cpus-per-task=4
-#SBATCH --array=0-31%5
-#SBATCH --mem=5G
+#SBATCH --time=05:00:00
+#SBATCH --array=
+#SBATCH --mem=32G
 #SBATCH --mail-type=all
 #SBATCH --mail-user=d.j.haynes-simmons@umcutrecht.nl
 
