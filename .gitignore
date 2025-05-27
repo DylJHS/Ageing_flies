@@ -4,13 +4,14 @@
 /logs
 /.Rproj.user
 
-/scripts/random_search.py
 /scripts/.Rhistory
 /scripts/.RData
 /scripts/*.identifier
+/scripts/untracked
 
 scripts/.RhistoryZone.Identifier
 scripts/.RDataZone.Identifier
 
 scripts/afca_analysis/dgea/.RDataTmp
 scripts/afca_analysis/Vis/.Rhistory
+
